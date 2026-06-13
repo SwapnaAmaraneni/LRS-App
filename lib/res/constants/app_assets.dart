@@ -1,0 +1,32 @@
+class AppAssets {
+  AppAssets._();
+  static const String appIcon = 'assets/logo.png';
+  static const String splash = 'assets/splash.png';
+  static const String appBg = 'assets/app_bg.png';
+  static const String appBgScreens = 'assets/app_screens_bg.png';
+  static const String footerCgg = 'assets/footer.png';
+  static const String loader = 'assets/loader.gif';
+  static const String privacy = "assets/privacy.png";
+  static const String logout = "assets/logout.png";
+  static const String appInfo = "assets/app_info.png";
+  static const String exit = "assets/exit.png";
+  static const String home = "assets/home.png";
+  static const String application = "assets/application.png";
+  static const String report = "assets/report.png";
+  static const String addMarker = "assets/add_map.png";
+  static const String saveMap = "assets/save_map.png";
+  static const String removeMarker = "assets/remove_map.png";
+  static const String clearMarkers = "assets/clear_map.png";
+  static const String viewPolygon = "assets/view_map.png";
+  static const String cam = "assets/cam.png";
+  static const String fileUpload = "assets/file_upload.png";
+  static const String pdfUploaded = "assets/pdf.png";
+  static const String captureLoc = "assets/maps.png";
+  static const String stop = "assets/stop.png";
+  static const String viewmap = "assets/viewmap.png";
+  static const String deleteIcon = "assets/delete.png";
+  static const String plotIcon = "assets/Plot.png";
+  static const String layoutIcon = "assets/Layout.png";
+  static const String savedPlotsIcon = "assets/plotting.png";
+  static const String applicationSearch = "assets/application_search.png";
+}

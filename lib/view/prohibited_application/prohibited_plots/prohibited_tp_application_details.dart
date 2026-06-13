@@ -1,0 +1,1039 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:lrsofficer/data/local_store_helper.dart';
+import 'package:lrsofficer/data/logger_resuable.dart';
+import 'package:lrsofficer/models/list_of_master_plan_zdp_response.dart';
+import 'package:lrsofficer/res/CustomAlerts/validation_ios_alert.dart';
+import 'package:lrsofficer/res/CustomAlerts/warning_alert_with_two_buttons.dart';
+import 'package:lrsofficer/res/constants/app_assets.dart';
+import 'package:lrsofficer/res/constants/app_colors.dart';
+import 'package:lrsofficer/res/reusable_widgets/app_bar_reusable.dart';
+import 'package:lrsofficer/res/reusable_widgets/app_input_textfield.dart';
+import 'package:lrsofficer/res/reusable_widgets/dropdown_reusable.dart';
+import 'package:lrsofficer/res/reusable_widgets/officer_approval_status_reusable_widget.dart';
+import 'package:lrsofficer/res/reusable_widgets/otp_component.dart';
+import 'package:lrsofficer/res/reusable_widgets/pdf_view_widget.dart';
+import 'package:lrsofficer/utils/loader.dart';
+import 'package:lrsofficer/utils/reusable_button.dart';
+import 'package:lrsofficer/utils/shared_pref_constants.dart';
+import 'package:lrsofficer/view/document_download.dart';
+import 'package:lrsofficer/view_model/Prohibited_applications_view_model/prohibited_application_details_view_model.dart';
+import 'package:lrsofficer/view_model/document_download_viewmodel.dart';
+import 'package:lrsofficer/view_model/geo_coordinates_view_model_new.dart';
+import 'package:lrsofficer/view_model/update_mobile_no_view_model.dart';
+import 'package:provider/provider.dart';
+
+class ProhibitedApplicationDetails extends StatefulWidget {
+  const ProhibitedApplicationDetails({super.key});
+
+  @override
+  State<ProhibitedApplicationDetails> createState() =>
+      _ProhibitedApplicationDetailsState();
+}
+
+class _ProhibitedApplicationDetailsState
+    extends State<ProhibitedApplicationDetails> {
+  // Read-only controllers remain local (they are always set from API)
+  TextEditingController layoutOwnerController = TextEditingController();
+  TextEditingController netPlotAreaExtentController = TextEditingController();
+  TextEditingController villageNameController = TextEditingController();
+  TextEditingController localityController = TextEditingController();
+  TextEditingController surveyNoController = TextEditingController();
+  List<TextEditingController> officerApprovalControllers = [];
+  List<TextEditingController> createdByControllers = [];
+  List<TextEditingController> notesAddedControllers = [];
+  TextEditingController newMobileNoController = TextEditingController();
+  bool isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final prohibitedApplDetailsProvider =
+        Provider.of<ProhibitedApplicationDetailsViewModel>(context);
+    final documentDownloadProvider =
+        Provider.of<DocumentDownloadViewModel>(context);
+    final updateMobileProvider = Provider.of<UpdateMobileNoViewModel>(context);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          /* prohibitedApplDetailsProvider.clusterApplDetails.isNotEmpty
+              ? WarningCustomCupertinoAlertTwoButtons().showAlert(
+                  context,
+                  message:
+                      "Data of the Application ID : ${prohibitedApplDetailsProvider.clusterApplDetails[0].aPPLICATIONID} will be lost. Do you want to continue? ",
+                  onPressedOk: () {
+                    clearSavedData(context);
+                    //dialog pop
+                    Navigator.pop(
+                      context,
+                    );
+                    //page Pop
+                    Navigator.pop(
+                      context,
+                    );
+                  },
+                  onPressedCancel: () {
+                    Navigator.pop(context);
+                  },
+                )
+              : */ Navigator.pop(context);
+        }
+      },
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBarReusable(
+              title: "Prohibited Application Details",
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  /* prohibitedApplDetailsProvider.clusterApplDetails.isNotEmpty
+                      ? WarningCustomCupertinoAlertTwoButtons().showAlert(
+                          context,
+                          message:
+                              "Data of the Application ID : ${prohibitedApplDetailsProvider.clusterApplDetails[0].aPPLICATIONID} will be lost. Do you want to continue? ",
+                          onPressedOk: () {
+                            clearSavedData(context);
+                            //dialog pop
+                            Navigator.pop(
+                              context,
+                            );
+                            //page Pop
+                            Navigator.pop(
+                              context,
+                            );
+                          },
+                          onPressedCancel: () {
+                            Navigator.pop(context);
+                          },
+                        )
+                      :  */Navigator.pop(context);
+                },
+              ),
+            ),
+            body: SafeArea(
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: ExactAssetImage(AppAssets.appBg),
+                  ),
+                ),
+                padding: const EdgeInsets.all(6.0),
+                child: prohibitedApplDetailsProvider
+                        .clusterApplDetails.isNotEmpty
+                    ? SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.98,
+                              child: Card(
+                                elevation: 4.0,
+                                child: ExpansionTile(
+                                  dense: true,
+                                  visualDensity:
+                                      VisualDensity.adaptivePlatformDensity,
+                                  tilePadding: const EdgeInsets.all(0),
+                                  title: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      getTitleCard(
+                                        "Application Details",
+                                        /*  style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.0,
+                                        ), */
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      buildLabelValueRow("Application No",
+                                          "${prohibitedApplDetailsProvider.clusterApplDetails[0].aPPLICATIONID}"),
+                                      buildLabelValueRow("Applicant Name",
+                                          "${prohibitedApplDetailsProvider.clusterApplDetails[0].lAYOUTOWNERNAME}"),
+                                    ],
+                                  ),
+                                  children: [
+                                    buildLabelValueRow("Aadhar No",
+                                        "${prohibitedApplDetailsProvider.clusterApplDetails[0].aADHARNUMBER}"),
+                                    buildLabelValueRow("Owner Mobile Number",
+                                        "${prohibitedApplDetailsProvider.clusterApplDetails[0].oWNERMOBILENUMBER}"),
+                                    buildLabelValueRow("Address",
+                                        "${prohibitedApplDetailsProvider.clusterApplDetails[0].aPPLICANTADDRESS}"),
+                                    buildLabelValueRow("District Name",
+                                        "${prohibitedApplDetailsProvider.clusterApplDetails[0].dISTRICTNAME}"),
+                                    buildLabelValueRow("Pincode",
+                                        "${prohibitedApplDetailsProvider.clusterApplDetails[0].pINCODE}"),
+                                    BuildDocumentView(
+                                        title: "Sales Deed Document",
+                                        pdfUrl: prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .sALEDEEDEC ??
+                                            ""),
+                                    BuildDocumentView(
+                                        title: "Layout Document",
+                                        pdfUrl: prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .cOPYOFLAYOUT ??
+                                            ""),
+                                    BuildDocumentView(
+                                        title: "Other Document",
+                                        pdfUrl: prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .oTHERSDOC ??
+                                            ""),
+                                    if ((prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc1 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc1 !=
+                                                "") ||
+                                        (prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc2 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc2 !=
+                                                "") ||
+                                        (prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc3 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc3 !=
+                                                "") ||
+                                        (prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc4 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc4 !=
+                                                "") ||
+                                        (prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc5 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc5 !=
+                                                "") ||
+                                        (prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc6 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibitedDoc6 !=
+                                                ""))
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                            "Citizen Updated Document",
+                                            textAlign: TextAlign.start,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    if (prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc1 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc1 !=
+                                            "")
+                                      BuildDocumentView(
+                                          title: "Sale Deed Document",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibitedDoc1 ??
+                                              ""),
+                                    if (prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc2 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc2 !=
+                                            "")
+                                      BuildDocumentView(
+                                          title: "Link Document",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibitedDoc2 ??
+                                              ""),
+                                    if (prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc3 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc3 !=
+                                            "")
+                                      BuildDocumentView(
+                                          title: "Layout Copy",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibitedDoc3 ??
+                                              ""),
+                                    if (prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc4 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc4 !=
+                                            "")
+                                      BuildDocumentView(
+                                          title: "Plot site plan",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibitedDoc4 ??
+                                              ""),
+                                    if (prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc5 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc5 !=
+                                            "")
+                                      BuildDocumentView(
+                                          title: "Other Document 1",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibitedDoc5 ??
+                                              ""),
+                                    if (prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc6 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibitedDoc6 !=
+                                            "")
+                                      BuildDocumentView(
+                                          title: "Other Document 2",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibitedDoc6 ??
+                                              ""),
+                                    if ((prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibittedAdditionalDoc1 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibittedAdditionalDoc1 !=
+                                                "") ||
+                                        (prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibittedAdditionalDoc2 !=
+                                                null &&
+                                            prohibitedApplDetailsProvider
+                                                    .clusterApplDetails[0]
+                                                    .prohibittedAdditionalDoc2 !=
+                                                ""))
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                            "Additional Documents",
+                                            textAlign: TextAlign.start,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    if ((prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibittedAdditionalDoc1 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibittedAdditionalDoc1 !=
+                                            ""))
+                                      BuildDocumentView(
+                                          title: "Additional Document",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibittedAdditionalDoc1 ??
+                                              ""),
+                                    if ((prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibittedAdditionalDoc2 !=
+                                            null &&
+                                        prohibitedApplDetailsProvider
+                                                .clusterApplDetails[0]
+                                                .prohibittedAdditionalDoc2 !=
+                                            ""))
+                                      BuildDocumentView(
+                                          title: "Additional Document",
+                                          pdfUrl: prohibitedApplDetailsProvider
+                                                  .clusterApplDetails[0]
+                                                  .prohibittedAdditionalDoc2 ??
+                                              ""),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.98,
+                              child: Card(
+                                elevation: 4.0,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Column(
+                                    children: [
+                                      getTitleCard("Plot Details"),
+                                      Column(
+                                        children: [
+                                          AppInputTextfield(
+                                            hintText: "Layout Name",
+                                            nameController:
+                                                prohibitedApplDetailsProvider
+                                                    .layoutNameController,
+                                          ),
+                                          AppInputTextfield(
+                                            hintText:
+                                                "Layout Owner/Plot owner Name",
+                                            nameController:
+                                                layoutOwnerController,
+                                            isReadOnly: true,
+                                            textColor: Colors.grey,
+                                          ),
+                                          AppInputTextfield(
+                                            hintText: "Plot No",
+                                            nameController:
+                                                prohibitedApplDetailsProvider
+                                                    .plotNoController,
+                                          ),
+                                          AppInputTextfield(
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d+\.?\d{0,2}')),
+                                            ],
+                                            hintText:
+                                                "Plot Area Extent Sq.Yards(As on Ground)*",
+                                            nameController:
+                                                prohibitedApplDetailsProvider
+                                                    .plotAreaExtentController,
+                                            inputType: const TextInputType
+                                                .numberWithOptions(
+                                                decimal: true),
+                                            onChanged: (p0) {
+                                              num plotArea =
+                                                  num.tryParse(p0) ?? 0;
+                                              num roadEffectedArea = num.tryParse(
+                                                      prohibitedApplDetailsProvider
+                                                          .roadEffectedAreaExtentController
+                                                          .text) ??
+                                                  0;
+                                              if (roadEffectedArea < plotArea) {
+                                                if (plotArea -
+                                                        roadEffectedArea >
+                                                    0) {
+                                                  num netplotArea = plotArea -
+                                                      roadEffectedArea;
+                                                  netPlotAreaExtentController
+                                                      .text = "$netplotArea";
+                                                } else {
+                                                  prohibitedApplDetailsProvider
+                                                      .plotAreaExtentController
+                                                      .clear();
+                                                  netPlotAreaExtentController
+                                                      .clear();
+                                                  FocusScope.of(context)
+                                                      .unfocus();
+                                                }
+                                              } else {
+                                                prohibitedApplDetailsProvider
+                                                    .roadEffectedAreaExtentController
+                                                    .clear();
+                                                netPlotAreaExtentController
+                                                    .clear();
+                                                FocusScope.of(context)
+                                                    .unfocus();
+                                                ValidationIoSAlert().showAlert(
+                                                    context,
+                                                    description:
+                                                        "Plot Area cannot be less than road effected area");
+                                              }
+                                            },
+                                          ),
+                                          AppInputTextfield(
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d+\.?\d{0,2}')),
+                                            ],
+                                            hintText:
+                                                "Road Effected Area Extent Sq.Yards*",
+                                            nameController:
+                                               prohibitedApplDetailsProvider
+                                                   .roadEffectedAreaExtentController,
+                                            inputType: const TextInputType
+                                                .numberWithOptions(
+                                                decimal: true),
+                                            onChanged: (value) async {
+                                              num plotArea = num.tryParse(
+                                                      prohibitedApplDetailsProvider
+                                                          .plotAreaExtentController
+                                                          .text) ??
+                                                  0;
+                                              num roadEffectedArea =
+                                                  num.tryParse(value) ?? 0;
+
+                                              if (plotArea > 0) {
+                                                if (plotArea -
+                                                        roadEffectedArea >
+                                                    0) {
+                                                  num netplotArea = plotArea -
+                                                      roadEffectedArea;
+                                                  netPlotAreaExtentController
+                                                          .text =
+                                                      netplotArea
+                                                          .toStringAsFixed(2);
+                                                } else {
+                                                  prohibitedApplDetailsProvider
+                                                      .roadEffectedAreaExtentController
+                                                      .clear();
+                                                  netPlotAreaExtentController
+                                                      .clear();
+                                                  FocusScope.of(context)
+                                                      .unfocus();
+                                                  ValidationIoSAlert().showAlert(
+                                                      context,
+                                                      description:
+                                                          "Road Effected Area should be less than Plot Area");
+                                                }
+                                              } else {
+                                                prohibitedApplDetailsProvider
+                                                    .roadEffectedAreaExtentController
+                                                    .clear();
+                                                FocusScope.of(context)
+                                                    .unfocus();
+                                                ValidationIoSAlert().showAlert(
+                                                    context,
+                                                    description:
+                                                        "Please Enter Plot Area");
+                                              }
+                                            },
+                                          ),
+                                          AppInputTextfield(
+                                            hintText:
+                                                "Net plot Area Extent Sq.Yards",
+                                            nameController:
+                                                netPlotAreaExtentController,
+                                            isReadOnly: true,
+                                            textColor: Colors.grey,
+                                          ),
+                                          AppInputTextfield(
+                                            hintText: "Village Name",
+                                            nameController:
+                                                villageNameController,
+                                            isReadOnly: true,
+                                            textColor: Colors.grey,
+                                          ),
+                                          AppInputTextfield(
+                                            hintText: "Locality",
+                                            nameController: localityController,
+                                            isReadOnly: true,
+                                            textColor: Colors.grey,
+                                          ),
+                                          AppInputTextfield(
+                                            hintText: "Survey Number",
+                                            maxLines: null,
+                                            // height: 80,
+                                            nameController: surveyNoController,
+                                            isReadOnly: true,
+                                            textColor: Colors.grey,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0,
+                                                right: 8.0,
+                                                bottom: 8.0),
+                                            child: DropdownReusable<
+                                                    ListMasterPlansZDP>(
+                                                label:
+                                                    "Land use as per Master Plan/ZDP *",
+                                                items: prohibitedApplDetailsProvider
+                                                    .listMasterPlansZDP
+                                                    .map<
+                                                        DropdownMenuItem<
+                                                            ListMasterPlansZDP>>(
+                                                  (ListMasterPlansZDP item) {
+                                                    return DropdownMenuItem<
+                                                        ListMasterPlansZDP>(
+                                                      value: item,
+                                                      child: Text(
+                                                        item.landUseName ?? "",
+                                                        overflow: TextOverflow
+                                                            .visible,
+                                                        style: const TextStyle(
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                    );
+                                                  },
+                                                ).toList(),
+                                                onChanged: (ListMasterPlansZDP?
+                                                    newValue) async {
+                                                  prohibitedApplDetailsProvider
+                                                      .changeMasterPlanZDP(
+                                                          newValue);
+                                                },
+                                                selectedValue:
+                                                    prohibitedApplDetailsProvider
+                                                        .selectedListMasterPlansZDP,
+                                                isEnabled: true),
+                                          ),
+                                          if ((prohibitedApplDetailsProvider
+                                                  .clusterApplDetails)
+                                              .isNotEmpty)
+                                            if ((prohibitedApplDetailsProvider
+                                                        .clusterApplDetails[0]
+                                                        .officersComments ??
+                                                    [])
+                                                .isNotEmpty)
+                                              OfficerApprovalStatusReusableWidget(
+                                                  officerApprovalStatus:
+                                                      officerApprovalControllers,
+                                                  officerIds:
+                                                      createdByControllers,
+                                                  officerRemarks:
+                                                      notesAddedControllers),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.98,
+                              child: Card(
+                                elevation: 4.0,
+                                child: Column(
+                                  children: [
+                                    getTitleCard(
+                                      "Sale Deed Document Download",
+                                    ),
+                                    if (prohibitedApplDetailsProvider
+                                        .clusterApplDetails.isNotEmpty)
+                                      Padding(
+                                        padding: EdgeInsets.all(10.0),
+                                        child: DocumentDownload(
+                                          sroEditFlag:
+                                              prohibitedApplDetailsProvider
+                                                      .clusterApplDetails[0]
+                                                      .sroCodeEdit ??
+                                                  "",
+                                          callbackValue: (p0) {
+                                            prohibitedApplDetailsProvider
+                                                .setSroEdited(p0);
+                                          },
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.98,
+                              child: Card(
+                                elevation: 4.0,
+                                child: ExpansionTile(
+                                  maintainState: isExpanded,
+                                  onExpansionChanged: (value) {
+                                    setState(() {
+                                      AppLogger().logDebug(
+                                          "isExpandedVal:: $isExpanded");
+                                      isExpanded = !isExpanded;
+                                    });
+                                  },
+                                  dense: true,
+                                  visualDensity:
+                                      VisualDensity.adaptivePlatformDensity,
+                                  tilePadding: const EdgeInsets.all(0),
+                                  title: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      getTitleCard(
+                                        "Update Mobile Number",
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6.0),
+                                        child: buildLabelValueRow(
+                                            "Old Mobile Number",
+                                            "${prohibitedApplDetailsProvider.clusterApplDetails[0].oWNERMOBILENUMBER}"),
+                                      ),
+                                    ],
+                                  ),
+                                  children: [
+                                    AppInputTextfield(
+                                      nameController: newMobileNoController,
+                                      hintText: "New Mobile Number",
+                                      inputType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      length: 10,
+                                    ),
+                                    ReusableButton(
+                                      buttonText: "Send OTP",
+                                      onPressed: () {
+                                        if (prohibitedApplDetailsProvider
+                                            .validateNewMobileNo(
+                                                newMobileNoController,
+                                                context)) {
+                                          String mobileNumberNew =
+                                              newMobileNoController.text;
+                                          newMobileNoController.clear();
+                                          prohibitedApplDetailsProvider
+                                              .getResendOtp(
+                                                  context, mobileNumberNew);
+
+                                          showDialog(
+                                            context: context,
+                                            builder:
+                                                (BuildContext dialogContext) {
+                                              return Dialog(
+                                                child: PopScope(
+                                                  canPop: false,
+                                                  child: OTPVerificationPage(
+                                                    onValidatePressed: (otp) {
+                                                      setState(() {
+                                                        isExpanded =
+                                                            !isExpanded;
+                                                      });
+                                                      prohibitedApplDetailsProvider
+                                                          .validateOTp(
+                                                        context,
+                                                        dialogContext,
+                                                        otp,
+                                                        mobileNumberNew,
+                                                      );
+                                                    },
+                                                    onCancelPressed: () {
+                                                      Navigator.of(
+                                                              dialogContext)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: ReusableButton(
+                                buttonText: "next".tr(),
+                                onPressed: () async {
+                                  FocusScope.of(context).unfocus();
+                                  LocalStoreHelper sharedpref =
+                                      LocalStoreHelper();
+                                  await sharedpref.writeData(
+                                      SharedPrefConstants.applicationNo,
+                                      "${prohibitedApplDetailsProvider.clusterApplDetails[0].aPPLICATIONID}");
+                                  await sharedpref.writeData(
+                                    SharedPrefConstants.totalAreaExtent,
+                                    netPlotAreaExtentController.text,
+                                  );
+                                  final sroCode = await LocalStoreHelper()
+                                      .readTheData(SharedPrefConstants.sroCode);
+                                  if (!context.mounted) return;
+                                  prohibitedApplDetailsProvider
+                                      .navigateToUploadDocsScreen(
+                                    context,
+                                    applicationId: prohibitedApplDetailsProvider
+                                            .clusterApplDetails[0]
+                                            .aPPLICATIONID ??
+                                        "",
+                                    layoutName: prohibitedApplDetailsProvider
+                                            .clusterApplDetails[0].lAYOUTNAME ??
+                                        "",
+                                    plotNo: prohibitedApplDetailsProvider
+                                        .plotNoController.text,
+                                    areaExtent:
+                                        netPlotAreaExtentController.text.trim(),
+                                    plotAreaExtent: prohibitedApplDetailsProvider
+                                        .plotAreaExtentController.text.trim(),
+                                    roadAreaExtent: prohibitedApplDetailsProvider
+                                        .roadEffectedAreaExtentController.text
+                                        .trim(),
+                                    masterplanZdp: prohibitedApplDetailsProvider
+                                            .selectedListMasterPlansZDP
+                                            ?.landUseName ??
+                                        "",
+                                    sroCode: sroCode,
+                                    layoutNmae: prohibitedApplDetailsProvider
+                                        .layoutNameController.text,
+                                    applicationDetails:
+                                        prohibitedApplDetailsProvider
+                                            .clusterApplDetails[0],
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(),
+              ),
+            ),
+          ),
+          if (prohibitedApplDetailsProvider.getLoaderVisibilityStatus ||
+              updateMobileProvider.getLoaderVisibilityStatus ||
+              documentDownloadProvider.getLoaderVisibilityStatus)
+            const LoaderComponent()
+        ],
+      ),
+    );
+  }
+
+  Widget getTitleCard(String title) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.95,
+      child: Card(
+        elevation: 4.0,
+        color: AppColors.primaryColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            title,
+            style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildLabelValueRow(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120, // Fixed width for the label
+            child: Text(
+              "$label:",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value ?? "",
+              softWrap: true, // Allows text to wrap within its bounds
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      final prohibitedApplDetailsProvider =
+          Provider.of<ProhibitedApplicationDetailsViewModel>(context,
+              listen: false);
+
+      if (!mounted) return;
+      await prohibitedApplDetailsProvider
+          .getListOfMasterPlansZDPDetails(context);
+      if (!mounted) return;
+      await prohibitedApplDetailsProvider.getClusterApplDetails(context);
+      if (prohibitedApplDetailsProvider.clusterApplDetails.isNotEmpty) {
+        await LocalStoreHelper().writeData(
+            SharedPrefConstants.sroCode,
+            prohibitedApplDetailsProvider
+                    .clusterApplDetails[0].sROCODEFOURDIGITS ??
+                "");
+        await LocalStoreHelper().writeData(
+            SharedPrefConstants.saleDeedNo,
+            prohibitedApplDetailsProvider
+                    .clusterApplDetails[0].sALEDEEDNUMBER ??
+                "");
+
+        await LocalStoreHelper().writeData(
+            SharedPrefConstants.saleDeedYear,
+            prohibitedApplDetailsProvider.clusterApplDetails[0].sALEDEEDYEAR ??
+                "");
+        layoutOwnerController.text = prohibitedApplDetailsProvider
+                .clusterApplDetails[0].lAYOUTOWNERNAME ??
+            "";
+        // Only set editable fields if they're empty (preserve user edits on back-navigation)
+        if (prohibitedApplDetailsProvider.layoutNameController.text.isEmpty) {
+          prohibitedApplDetailsProvider.layoutNameController.text =
+              prohibitedApplDetailsProvider.clusterApplDetails[0].lAYOUTNAME ??
+                  "";
+        }
+        if (prohibitedApplDetailsProvider.plotNoController.text.isEmpty) {
+          prohibitedApplDetailsProvider.plotNoController.text =
+              prohibitedApplDetailsProvider.clusterApplDetails[0].pLOTNO ?? "";
+        }
+        netPlotAreaExtentController.text =
+            prohibitedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ??
+                "";
+        if (prohibitedApplDetailsProvider.plotAreaExtentController.text.isEmpty) {
+          prohibitedApplDetailsProvider.plotAreaExtentController.text =
+              (prohibitedApplDetailsProvider
+                              .clusterApplDetails[0].pLOTAREAEXTENT ??
+                          "".trim())
+                      .isEmpty
+                  ? prohibitedApplDetailsProvider
+                          .clusterApplDetails[0].aREAEXTENT ??
+                      ""
+                  : prohibitedApplDetailsProvider
+                          .clusterApplDetails[0].pLOTAREAEXTENT ??
+                      "";
+        }
+        if (prohibitedApplDetailsProvider
+            .roadEffectedAreaExtentController.text.isEmpty) {
+          prohibitedApplDetailsProvider.roadEffectedAreaExtentController.text =
+              prohibitedApplDetailsProvider
+                      .clusterApplDetails[0].rOADAREAEXTENT ??
+                  "";
+        }
+        villageNameController.text =
+            prohibitedApplDetailsProvider.clusterApplDetails[0].vILLAGENAME ??
+                "";
+        localityController.text =
+            prohibitedApplDetailsProvider.clusterApplDetails[0].lOCALITY ?? "";
+        surveyNoController.text =
+            prohibitedApplDetailsProvider.clusterApplDetails[0].sURVEYNUMBER ??
+                "";
+        // Only populate officer comments list once
+        if (officerApprovalControllers.isEmpty) {
+          var officersCommentsList = prohibitedApplDetailsProvider
+                  .clusterApplDetails[0].officersComments ??
+              [];
+          for (var comment in officersCommentsList) {
+            officerApprovalControllers
+                .add(TextEditingController(text: comment.aPPROVALFLAG ?? ""));
+            createdByControllers
+                .add(TextEditingController(text: comment.cREATEDBY ?? ""));
+            notesAddedControllers
+                .add(TextEditingController(text: comment.aDDNOTES ?? ""));
+          }
+        }
+
+        await LocalStoreHelper().writeData(
+            SharedPrefConstants.sroCode,
+            prohibitedApplDetailsProvider
+                    .clusterApplDetails[0].sROCODEFOURDIGITS ??
+                "");
+        await LocalStoreHelper().writeData(
+            SharedPrefConstants.saleDeedNo,
+            prohibitedApplDetailsProvider
+                    .clusterApplDetails[0].sALEDEEDNUMBER ??
+                "");
+        await LocalStoreHelper().writeData(
+            SharedPrefConstants.checkListKey,
+            prohibitedApplDetailsProvider.clusterApplDetails[0].strCHECKLIST ??
+                "");
+        await LocalStoreHelper().writeData(
+            SharedPrefConstants.saleDeedYear,
+            prohibitedApplDetailsProvider.clusterApplDetails[0].sALEDEEDYEAR ??
+                "");
+      }
+    });
+  }
+
+  void clearSavedData(BuildContext context) {
+    final captureGeoCoordinatesProvider =
+        Provider.of<CaptureGeoCoordinatesViewModelNew>(context, listen: false);
+    captureGeoCoordinatesProvider.onClear(context);
+    // Clearing values for Application Details
+    LocalStoreHelper().removeData(SharedPrefConstants.applicationNo);
+    LocalStoreHelper().removeData(SharedPrefConstants.layoutNameKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.plotNoKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.areaExtentKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.plotAreaExtentKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.roadAreaExtentKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.masterplanZdpKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.latitudeKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.longitudeKey);
+
+// Clearing values for Upload Details
+    LocalStoreHelper().removeData(SharedPrefConstants.layoutSelectedDocKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.ownershipSelectedDocKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.ecSelectedDocKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.plot1Img);
+    LocalStoreHelper().removeData(SharedPrefConstants.plot2Img);
+    LocalStoreHelper().removeData(SharedPrefConstants.plot3Img);
+    LocalStoreHelper().removeData(SharedPrefConstants.plot4ImgMasterPlanExt);
+    LocalStoreHelper()
+        .removeData(SharedPrefConstants.plot5ImgCaptureLocScreenshot);
+    LocalStoreHelper().removeData(SharedPrefConstants.layoutDocumentradioVal);
+    LocalStoreHelper().removeData(SharedPrefConstants.ownershipDocumetRadioVal);
+    LocalStoreHelper().removeData(SharedPrefConstants.ecDocumentRadioVal);
+    LocalStoreHelper().removeData(SharedPrefConstants.gisCoordinatesList);
+
+    // Clearing values for Check Details
+    LocalStoreHelper().removeData(SharedPrefConstants.checkListKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.questionsChecklist);
+
+    // Clearing values for Payment Details
+    LocalStoreHelper().removeData(SharedPrefConstants.srdpRdpKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.conversionChargesKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.mvRate2020Key);
+    LocalStoreHelper().removeData(SharedPrefConstants.mvRateDocumentKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.rcKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.vltKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.plotOpenspaceKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.trcKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.mvEditFlagKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.isCalculate);
+
+    //Recommendations
+    LocalStoreHelper().removeData(SharedPrefConstants.additionalConditionKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.notesKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.conditionKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.recommendationsKey);
+
+    //Layout
+    LocalStoreHelper().removeData(SharedPrefConstants.totalNoOfPlotsKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.selectedUnsoldPlotKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.soldPlotsKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.unsoldPlotsKey);
+    LocalStoreHelper().removeData(SharedPrefConstants.totalunsoldPlotAreakey);
+    LocalStoreHelper().removeData(SharedPrefConstants.unsoldPlotListKey);
+  }
+}
