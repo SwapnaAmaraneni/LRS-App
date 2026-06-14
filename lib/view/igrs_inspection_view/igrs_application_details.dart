@@ -63,31 +63,9 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
         Provider.of<DocumentDownloadViewModel>(context);
     final updateMobileProvider = Provider.of<UpdateMobileNoViewModel>(context);
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          applicationDetailsProvider.clusterApplDetails.isNotEmpty
-              ? WarningCustomCupertinoAlertTwoButtons().showAlert(
-                  context,
-                  message:
-                      "Data of the Application ID : ${applicationDetailsProvider.clusterApplDetails[0].aPPLICATIONID} will be lost. Do you want to continue? ",
-                  onPressedOk: () {
-                    clearSavedData(context);
-                    //dialog pop
-                    Navigator.pop(
-                      context,
-                    );
-                    //page Pop
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-                  onPressedCancel: () {
-                    Navigator.pop(context);
-                  },
-                )
-              : Navigator.pop(context);
-        }
+        // Pop naturally
       },
       child: Stack(
         children: [
@@ -97,30 +75,7 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
-                  if (applicationDetailsProvider
-                      .clusterApplDetails.isNotEmpty) {
-                    WarningCustomCupertinoAlertTwoButtons().showAlert(
-                      context,
-                      message:
-                          "Data of the Application ID : ${applicationDetailsProvider.clusterApplDetails[0].aPPLICATIONID} will be lost. Do you want to continue? ",
-                      onPressedOk: () {
-                        clearSavedData(context);
-                        //dialog pop
-                        Navigator.pop(
-                          context,
-                        );
-                        //page Pop
-                        Navigator.pop(
-                          context,
-                        );
-                      },
-                      onPressedCancel: () {
-                        Navigator.pop(context);
-                      },
-                    );
-                  } else {
-                    Navigator.pop(context);
-                  }
+                  Navigator.pop(context);
                 },
               ),
             ),
@@ -515,53 +470,65 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
                                       getTitleCard("Plot Details"),
                                       Column(
                                         children: [
-                                          AppInputTextfield(
-                                            isReadOnly:
-                                                AppConstants.userType != "tp",
-                                            textColor:
-                                                AppConstants.userType != "tp"
-                                                    ? Colors.grey
-                                                    : Colors.black,
-                                            hintText: "Layout Name",
-                                            length: 100,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(
-                                                      r'^[A-Za-z0-9 _\-\/]{0,100}'))
-                                            ],
-                                            nameController:
-                                                layoutNameController,
-                                          ),
-                                          AppInputTextfield(
-                                            isReadOnly: true,
-                                            textColor: Colors.grey,
-                                            hintText:
-                                                "Layout Owner/Plot owner Name",
-                                            length: 100,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(
-                                                      r'^[A-Za-z0-9 _\-\/]{0,100}'))
-                                            ],
-                                            nameController:
-                                                layoutOwnerController,
-                                          ),
-                                          AppInputTextfield(
-                                            isReadOnly:
-                                                AppConstants.userType != "tp",
-                                            textColor:
-                                                AppConstants.userType != "tp"
-                                                    ? Colors.grey
-                                                    : Colors.black,
-                                            hintText: "Plot No",
-                                            length: 20,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(
-                                                      r'^[A-Za-z0-9 _\-\/]{0,100}'))
-                                            ],
-                                            nameController: plotNoController,
-                                          ),
+                                           AppInputTextfield(
+                                             isReadOnly:
+                                                 AppConstants.userType != "tp",
+                                             textColor:
+                                                 AppConstants.userType != "tp"
+                                                     ? Colors.grey
+                                                     : Colors.black,
+                                             hintText: "Layout Name",
+                                             length: 100,
+                                             inputFormatters: [
+                                               FilteringTextInputFormatter.allow(
+                                                   RegExp(
+                                                       r'^[A-Za-z0-9 _\-\/]{0,100}'))
+                                             ],
+                                             nameController:
+                                                 layoutNameController,
+                                             onChanged: (value) async {
+                                               SharedPreferences prefs = await SharedPreferences.getInstance();
+                                               await prefs.setString(
+                                                   SharedPrefConstants.layoutNameKey,
+                                                   value);
+                                             },
+                                           ),
+                                           AppInputTextfield(
+                                             isReadOnly: true,
+                                             textColor: Colors.grey,
+                                             hintText:
+                                                 "Layout Owner/Plot owner Name",
+                                             length: 100,
+                                             inputFormatters: [
+                                               FilteringTextInputFormatter.allow(
+                                                   RegExp(
+                                                       r'^[A-Za-z0-9 _\-\/]{0,100}'))
+                                             ],
+                                             nameController:
+                                                 layoutOwnerController,
+                                           ),
+                                           AppInputTextfield(
+                                             isReadOnly:
+                                                 AppConstants.userType != "tp",
+                                             textColor:
+                                                 AppConstants.userType != "tp"
+                                                     ? Colors.grey
+                                                     : Colors.black,
+                                             hintText: "Plot No",
+                                             length: 20,
+                                             inputFormatters: [
+                                               FilteringTextInputFormatter.allow(
+                                                   RegExp(
+                                                       r'^[A-Za-z0-9 _\-\/]{0,100}'))
+                                             ],
+                                             nameController: plotNoController,
+                                             onChanged: (value) async {
+                                               SharedPreferences prefs = await SharedPreferences.getInstance();
+                                               await prefs.setString(
+                                                   SharedPrefConstants.plotNoKey,
+                                                   value);
+                                             },
+                                           ),
                                           AppInputTextfield(
                                             isReadOnly:
                                                 true /*  AppConstants.userType != "tp" */,
@@ -747,12 +714,16 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
                                                   );
                                                 },
                                               ).toList(),
-                                              onChanged: (ListMasterPlansZDP?
-                                                  newValue) async {
-                                                applicationDetailsProvider
-                                                    .changeMasterPlanZDP(
-                                                        newValue);
-                                              },
+                                               onChanged: (ListMasterPlansZDP?
+                                                   newValue) async {
+                                                 applicationDetailsProvider
+                                                     .changeMasterPlanZDP(
+                                                         newValue);
+                                                 SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                 await prefs.setString(
+                                                     SharedPrefConstants.masterplanZdpKey,
+                                                     newValue?.landUseName ?? "");
+                                               },
                                               selectedValue:
                                                   applicationDetailsProvider
                                                       .selectedListMasterPlansZDP,
@@ -1091,13 +1062,20 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
             SharedPrefConstants.saleDeedYear,
             applicationDetailsProvider.clusterApplDetails[0].sALEDEEDYEAR ??
                 "");
-        layoutNameController.text =
-            applicationDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? "";
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        final savedLayoutName = prefs.getString(SharedPrefConstants.layoutNameKey) ?? "";
+        final savedPlotNo = prefs.getString(SharedPrefConstants.plotNoKey) ?? "";
+        final savedZdp = prefs.getString(SharedPrefConstants.masterplanZdpKey) ?? "";
+
+        layoutNameController.text = (applicationDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? "").isNotEmpty
+            ? applicationDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? ""
+            : savedLayoutName;
         layoutOwnerController.text =
             applicationDetailsProvider.clusterApplDetails[0].lAYOUTOWNERNAME ??
                 "";
-        plotNoController.text =
-            applicationDetailsProvider.clusterApplDetails[0].pLOTNO ?? "";
+        plotNoController.text = (applicationDetailsProvider.clusterApplDetails[0].pLOTNO ?? "").isNotEmpty
+            ? applicationDetailsProvider.clusterApplDetails[0].pLOTNO ?? ""
+            : savedPlotNo;
         netPlotAreaExtentController.text =
             applicationDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? "";
         plotAreaExtentController.text = (applicationDetailsProvider
@@ -1122,9 +1100,9 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
             applicationDetailsProvider.clusterApplDetails[0].l2Remarks ?? "";
         l3RemarksController.text =
             applicationDetailsProvider.clusterApplDetails[0].l3Remarks ?? "";
-        final zdp =
-            applicationDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ??
-                "";
+        final zdp = (applicationDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "").isNotEmpty
+            ? applicationDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? ""
+            : savedZdp;
         if (zdp.isNotEmpty) {
           applicationDetailsProvider.selectedListMasterPlansZDP =
               applicationDetailsProvider.listMasterPlansZDP.firstWhere(
@@ -1162,8 +1140,7 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
             SharedPrefConstants.saleDeedYear,
             applicationDetailsProvider.clusterApplDetails[0].sALEDEEDYEAR ??
                 "");
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        final checkListStr = (applicationDetailsProvider
+        final apiChecklist = (applicationDetailsProvider
                         .clusterApplDetails[0].listSaveDatas !=
                     null &&
                 (applicationDetailsProvider
@@ -1172,58 +1149,95 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
                     0)
             ? jsonEncode(
                 applicationDetailsProvider.clusterApplDetails[0].listSaveDatas)
-            : [];
-        prefs.setString(
-            SharedPrefConstants.checkListKey, checkListStr.toString());
-        prefs.setString(SharedPrefConstants.layoutSelectedDocKey,
-            applicationDetailsProvider.clusterApplDetails[0].lAYOUTDOC ?? "");
-        prefs.setString(SharedPrefConstants.ecSelectedDocKey,
-            applicationDetailsProvider.clusterApplDetails[0].eCDOC ?? "");
-        prefs.setString(
-            SharedPrefConstants.ownershipSelectedDocKey,
-            applicationDetailsProvider.clusterApplDetails[0].oWNERSHIPDOC ??
-                "");
-        prefs.setString(SharedPrefConstants.plot1Img,
-            applicationDetailsProvider.clusterApplDetails[0].pHOTO1 ?? "");
-        prefs.setString(SharedPrefConstants.plot2Img,
-            applicationDetailsProvider.clusterApplDetails[0].pHOTO2 ?? "");
-        prefs.setString(SharedPrefConstants.plot3Img,
-            applicationDetailsProvider.clusterApplDetails[0].pHOTO3 ?? "");
-        prefs.setString(SharedPrefConstants.plot4ImgMasterPlanExt,
-            applicationDetailsProvider.clusterApplDetails[0].pHOTO4 ?? "");
+            : "";
+        final savedChecklist = prefs.getString(SharedPrefConstants.checkListKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.checkListKey,
+            apiChecklist.isNotEmpty ? apiChecklist : savedChecklist);
 
-        prefs.setString(
+        final apiLayoutDoc = applicationDetailsProvider.clusterApplDetails[0].lAYOUTDOC ?? "";
+        final savedLayoutDoc = prefs.getString(SharedPrefConstants.layoutSelectedDocKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.layoutSelectedDocKey,
+            apiLayoutDoc.isNotEmpty ? apiLayoutDoc : savedLayoutDoc);
+
+        final apiEcDoc = applicationDetailsProvider.clusterApplDetails[0].eCDOC ?? "";
+        final savedEcDoc = prefs.getString(SharedPrefConstants.ecSelectedDocKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.ecSelectedDocKey,
+            apiEcDoc.isNotEmpty ? apiEcDoc : savedEcDoc);
+
+        final apiOwnershipDoc = applicationDetailsProvider.clusterApplDetails[0].oWNERSHIPDOC ?? "";
+        final savedOwnershipDoc = prefs.getString(SharedPrefConstants.ownershipSelectedDocKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.ownershipSelectedDocKey,
+            apiOwnershipDoc.isNotEmpty ? apiOwnershipDoc : savedOwnershipDoc);
+
+        final apiPhoto1 = applicationDetailsProvider.clusterApplDetails[0].pHOTO1 ?? "";
+        final savedPhoto1 = prefs.getString(SharedPrefConstants.plot1Img) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot1Img,
+            apiPhoto1.isNotEmpty ? apiPhoto1 : savedPhoto1);
+
+        final apiPhoto2 = applicationDetailsProvider.clusterApplDetails[0].pHOTO2 ?? "";
+        final savedPhoto2 = prefs.getString(SharedPrefConstants.plot2Img) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot2Img,
+            apiPhoto2.isNotEmpty ? apiPhoto2 : savedPhoto2);
+
+        final apiPhoto3 = applicationDetailsProvider.clusterApplDetails[0].pHOTO3 ?? "";
+        final savedPhoto3 = prefs.getString(SharedPrefConstants.plot3Img) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot3Img,
+            apiPhoto3.isNotEmpty ? apiPhoto3 : savedPhoto3);
+
+        final apiPhoto4 = applicationDetailsProvider.clusterApplDetails[0].pHOTO4 ?? "";
+        final savedPhoto4 = prefs.getString(SharedPrefConstants.plot4ImgMasterPlanExt) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot4ImgMasterPlanExt,
+            apiPhoto4.isNotEmpty ? apiPhoto4 : savedPhoto4);
+
+        final apiGisCoordinate = applicationDetailsProvider.clusterApplDetails[0].gISCORDINATE ?? "";
+        final savedGisCoordinate = prefs.getString(SharedPrefConstants.gisCoordinatesList) ?? "";
+        await prefs.setString(
             SharedPrefConstants.gisCoordinatesList,
-            applicationDetailsProvider.clusterApplDetails[0].gISCORDINATE ??
-                "");
-        prefs.setString(SharedPrefConstants.mvEditFlagKey,
-            applicationDetailsProvider.clusterApplDetails[0].mvEditFlag ?? "");
-        prefs.setString(SharedPrefConstants.mvRate2020Key,
-            applicationDetailsProvider.clusterApplDetails[0].mVRATE2020 ?? "");
-        prefs.setString(
-            SharedPrefConstants.mvRateDocumentKey,
-            applicationDetailsProvider.clusterApplDetails[0].mVRATEDOCUMET ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.conversionChargesKey,
-            applicationDetailsProvider
-                    .clusterApplDetails[0].conversionCharges ??
-                "");
-        // basic regular charges
-        prefs.setString(SharedPrefConstants.rcKey,
-            applicationDetailsProvider.clusterApplDetails[0].rC ?? "");
-        prefs.setString(
-            SharedPrefConstants.plotOpenspaceKey,
-            applicationDetailsProvider.clusterApplDetails[0].pLOTOPENSPACE ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.rebate,
-            applicationDetailsProvider.clusterApplDetails[0].rebateAmount ??
-                "");
-        prefs.setString(SharedPrefConstants.trcKey,
-            applicationDetailsProvider.clusterApplDetails[0].tRC ?? "");
-        prefs.setString(SharedPrefConstants.amountPaid,
-            applicationDetailsProvider.clusterApplDetails[0].paidAmount ?? "");
+            apiGisCoordinate.isNotEmpty ? apiGisCoordinate : savedGisCoordinate);
+
+        final apiMvEditFlag = applicationDetailsProvider.clusterApplDetails[0].mvEditFlag ?? "";
+        final savedMvEditFlag = prefs.getString(SharedPrefConstants.mvEditFlagKey) ?? "";
+        await prefs.setString(SharedPrefConstants.mvEditFlagKey, apiMvEditFlag.isNotEmpty ? apiMvEditFlag : savedMvEditFlag);
+
+        final apiMvRate2020 = applicationDetailsProvider.clusterApplDetails[0].mVRATE2020 ?? "";
+        final savedMvRate2020 = prefs.getString(SharedPrefConstants.mvRate2020Key) ?? "";
+        await prefs.setString(SharedPrefConstants.mvRate2020Key, apiMvRate2020.isNotEmpty ? apiMvRate2020 : savedMvRate2020);
+
+        final apiMvRateDoc = applicationDetailsProvider.clusterApplDetails[0].mVRATEDOCUMET ?? "";
+        final savedMvRateDoc = prefs.getString(SharedPrefConstants.mvRateDocumentKey) ?? "";
+        await prefs.setString(SharedPrefConstants.mvRateDocumentKey, apiMvRateDoc.isNotEmpty ? apiMvRateDoc : savedMvRateDoc);
+
+        final apiConversionCharges = applicationDetailsProvider.clusterApplDetails[0].conversionCharges ?? "";
+        final savedConversionCharges = prefs.getString(SharedPrefConstants.conversionChargesKey) ?? "";
+        await prefs.setString(SharedPrefConstants.conversionChargesKey, apiConversionCharges.isNotEmpty ? apiConversionCharges : savedConversionCharges);
+
+        final apiRc = applicationDetailsProvider.clusterApplDetails[0].rC ?? "";
+        final savedRc = prefs.getString(SharedPrefConstants.rcKey) ?? "";
+        await prefs.setString(SharedPrefConstants.rcKey, apiRc.isNotEmpty ? apiRc : savedRc);
+
+        final apiPlotOpenspace = applicationDetailsProvider.clusterApplDetails[0].pLOTOPENSPACE ?? "";
+        final savedPlotOpenspace = prefs.getString(SharedPrefConstants.plotOpenspaceKey) ?? "";
+        await prefs.setString(SharedPrefConstants.plotOpenspaceKey, apiPlotOpenspace.isNotEmpty ? apiPlotOpenspace : savedPlotOpenspace);
+
+        final apiRebate = applicationDetailsProvider.clusterApplDetails[0].rebateAmount ?? "";
+        final savedRebate = prefs.getString(SharedPrefConstants.rebate) ?? "";
+        await prefs.setString(SharedPrefConstants.rebate, apiRebate.isNotEmpty ? apiRebate : savedRebate);
+
+        final apiTrc = applicationDetailsProvider.clusterApplDetails[0].tRC ?? "";
+        final savedTrc = prefs.getString(SharedPrefConstants.trcKey) ?? "";
+        await prefs.setString(SharedPrefConstants.trcKey, apiTrc.isNotEmpty ? apiTrc : savedTrc);
+
+        final apiAmountPaid = applicationDetailsProvider.clusterApplDetails[0].paidAmount ?? "";
+        final savedAmountPaid = prefs.getString(SharedPrefConstants.amountPaid) ?? "";
+        await prefs.setString(SharedPrefConstants.amountPaid, apiAmountPaid.isNotEmpty ? apiAmountPaid : savedAmountPaid);
       }
     });
   }

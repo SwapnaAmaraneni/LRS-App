@@ -7,6 +7,7 @@ import 'package:lrsofficer/res/reusable_widgets/application_status_widget.dart';
 import 'package:lrsofficer/routes/app_routes.dart';
 import 'package:lrsofficer/utils/loader.dart';
 import 'package:lrsofficer/utils/shared_pref_constants.dart';
+import 'package:lrsofficer/res/CustomAlerts/warning_alert_with_two_buttons.dart';
 import 'package:lrsofficer/view_model/phase2_reverted_view_models/phase2_reverted_application_list_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -65,33 +66,60 @@ class _Phase2RevertedApplicationListState
                                     onTap: () async {
                                       LocalStoreHelper sharedpref =
                                           LocalStoreHelper();
-                                      await sharedpref.writeData(
-                                          SharedPrefConstants.applicationNo,
-                                          "${data.aPPLICATIONID}");
-                                      final userType = await LocalStoreHelper()
-                                          .readTheData(
-                                              SharedPrefConstants.userType);
-                                      if (!context.mounted) return;
-                                      if (userType.toString().toLowerCase() ==
-                                          "tp") {
-                                        if (AppConstants.isLayoutPlot == "L") {
-                                          Navigator.pushNamed(
-                                            context,
-                                            AppRoutes
-                                                .phase2RevertedLayoutApplicationDetails,
-                                          );
+                                      String existingAppNo = (await sharedpref.readTheData(
+                                          SharedPrefConstants.applicationNo) ?? "").toString();
+                                      String selectedAppNo = "${data.aPPLICATIONID}";
+
+                                      Future<void> navigateToDetails() async {
+                                        final userType = await LocalStoreHelper()
+                                            .readTheData(
+                                                SharedPrefConstants.userType);
+                                        if (!context.mounted) return;
+                                        if (userType.toString().toLowerCase() ==
+                                            "tp") {
+                                          if (AppConstants.isLayoutPlot == "L") {
+                                            Navigator.pushNamed(
+                                              context,
+                                              AppRoutes
+                                                  .phase2RevertedLayoutApplicationDetails,
+                                            );
+                                          } else {
+                                            Navigator.pushNamed(
+                                              context,
+                                              AppRoutes
+                                                  .phase2RevertedTpApplicationDetails,
+                                            );
+                                          }
                                         } else {
                                           Navigator.pushNamed(
-                                            context,
-                                            AppRoutes
-                                                .phase2RevertedTpApplicationDetails,
-                                          );
+                                              context,
+                                              AppRoutes
+                                                  .phase2RevertedIrReApplicationDetails);
                                         }
+                                      }
+
+                                      if (existingAppNo.isNotEmpty && existingAppNo != selectedAppNo) {
+                                        if (!context.mounted) return;
+                                        WarningCustomCupertinoAlertTwoButtons().showAlert(
+                                          context,
+                                          message: "There is unsaved data for Application ID: $existingAppNo. Do you want to discard it and continue with $selectedAppNo?",
+                                          onPressedOk: () async {
+                                            Navigator.pop(context);
+                                            await clearUnsavedData();
+                                            await sharedpref.writeData(
+                                                SharedPrefConstants.applicationNo,
+                                                selectedAppNo);
+                                            await navigateToDetails();
+                                          },
+                                          onPressedCancel: () {
+                                            Navigator.pop(context);
+                                          },
+                                        );
                                       } else {
-                                        Navigator.pushNamed(
-                                            context,
-                                            AppRoutes
-                                                .phase2RevertedIrReApplicationDetails);
+                                        await sharedpref.writeData(
+                                            SharedPrefConstants.applicationNo,
+                                            selectedAppNo);
+                                        await navigateToDetails();
                                       }
                                     },
                                     child: buildVillageCard(
@@ -209,5 +237,64 @@ class _Phase2RevertedApplicationListState
         context,
       );
     });
+  }
+
+  Future<void> clearUnsavedData() async {
+    final localStore = LocalStoreHelper();
+    await localStore.removeData(SharedPrefConstants.applicationNo);
+    await localStore.removeData(SharedPrefConstants.layoutNameKey);
+    await localStore.removeData(SharedPrefConstants.plotNoKey);
+    await localStore.removeData(SharedPrefConstants.areaExtentKey);
+    await localStore.removeData(SharedPrefConstants.plotAreaExtentKey);
+    await localStore.removeData(SharedPrefConstants.roadAreaExtentKey);
+    await localStore.removeData(SharedPrefConstants.masterplanZdpKey);
+    await localStore.removeData(SharedPrefConstants.latitudeKey);
+    await localStore.removeData(SharedPrefConstants.longitudeKey);
+
+    await localStore.removeData(SharedPrefConstants.layoutSelectedDocKey);
+    await localStore.removeData(SharedPrefConstants.ownershipSelectedDocKey);
+    await localStore.removeData(SharedPrefConstants.ecSelectedDocKey);
+    await localStore.removeData(SharedPrefConstants.plot1Img);
+    await localStore.removeData(SharedPrefConstants.plot2Img);
+    await localStore.removeData(SharedPrefConstants.plot3Img);
+    await localStore.removeData(SharedPrefConstants.plot4ImgMasterPlanExt);
+    await localStore.removeData(SharedPrefConstants.plot5ImgCaptureLocScreenshot);
+    await localStore.removeData(SharedPrefConstants.layoutDocumentradioVal);
+    await localStore.removeData(SharedPrefConstants.ownershipDocumetRadioVal);
+    await localStore.removeData(SharedPrefConstants.ecDocumentRadioVal);
+    await localStore.removeData(SharedPrefConstants.gisCoordinatesList);
+
+    await localStore.removeData(SharedPrefConstants.checkListKey);
+    await localStore.removeData(SharedPrefConstants.questionsChecklist);
+
+    await localStore.removeData(SharedPrefConstants.srdpRdpKey);
+    await localStore.removeData(SharedPrefConstants.conversionChargesKey);
+    await localStore.removeData(SharedPrefConstants.mvRate2020Key);
+    await localStore.removeData(SharedPrefConstants.mvRateDocumentKey);
+    await localStore.removeData(SharedPrefConstants.rcKey);
+    await localStore.removeData(SharedPrefConstants.vltKey);
+    await localStore.removeData(SharedPrefConstants.plotOpenspaceKey);
+    await localStore.removeData(SharedPrefConstants.trcKey);
+    await localStore.removeData(SharedPrefConstants.mvEditFlagKey);
+    await localStore.removeData(SharedPrefConstants.isCalculate);
+    await localStore.removeData(SharedPrefConstants.marketValueFlag);
+    await localStore.removeData(SharedPrefConstants.editedMv);
+    await localStore.removeData(SharedPrefConstants.editedMvDateOfRegstn);
+    await localStore.removeData(SharedPrefConstants.editedPlotAreaExtent);
+    await localStore.removeData(SharedPrefConstants.editedRoadAffectedArea);
+    await localStore.removeData(SharedPrefConstants.editedNetPlotArea);
+
+    await localStore.removeData(SharedPrefConstants.additionalConditionKey);
+    await localStore.removeData(SharedPrefConstants.notesKey);
+    await localStore.removeData(SharedPrefConstants.conditionKey);
+    await localStore.removeData(SharedPrefConstants.recommendationsKey);
+
+    await localStore.removeData(SharedPrefConstants.totalNoOfPlotsKey);
+    await localStore.removeData(SharedPrefConstants.selectedUnsoldPlotKey);
+    await localStore.removeData(SharedPrefConstants.soldPlotsKey);
+    await localStore.removeData(SharedPrefConstants.unsoldPlotsKey);
+    await localStore.removeData(SharedPrefConstants.totalunsoldPlotAreakey);
+    await localStore.removeData(SharedPrefConstants.unsoldPlotListKey);
+    await localStore.removeData(SharedPrefConstants.totalAreaExtent);
   }
 }

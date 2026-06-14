@@ -68,25 +68,9 @@ class _Phase2RevertedAddUnsoldPlotDetailsState
           "list:: ${phase2RevertedLayoutsProvider.plotDetailsList.length}");
     }
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          WarningCustomCupertinoAlertTwoButtons().showAlert(
-            context,
-            message:
-                "Data of the Application ID : ${phase2RevertedLayoutsProvider.clusterApplDetails[0].aPPLICATIONID} will be lost. Do you want to continue? ",
-            onPressedOk: () {
-              phase2RevertedLayoutsProvider.plotDetailsList.clear();
-              Navigator.popUntil(
-                context,
-                ModalRoute.withName(AppRoutes.layoutClusterApplicationsDetails),
-              );
-            },
-            onPressedCancel: () {
-              Navigator.pop(context);
-            },
-          );
-        }
+        // Pop naturally
       },
       child: Scaffold(
         appBar: const AppBarReusable(

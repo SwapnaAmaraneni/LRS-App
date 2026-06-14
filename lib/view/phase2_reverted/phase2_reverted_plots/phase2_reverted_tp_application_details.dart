@@ -65,31 +65,9 @@ class _Phase2RevertedApplicationDetailsState
         Provider.of<DocumentDownloadViewModel>(context);
     final updateMobileProvider = Provider.of<UpdateMobileNoViewModel>(context);
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          phase2RevertedApplDetailsProvider.clusterApplDetails.isNotEmpty
-              ? WarningCustomCupertinoAlertTwoButtons().showAlert(
-                  context,
-                  message:
-                      "Data of the Application ID : ${phase2RevertedApplDetailsProvider.clusterApplDetails[0].aPPLICATIONID} will be lost. Do you want to continue? ",
-                  onPressedOk: () {
-                    clearSavedData(context);
-                    //dialog pop
-                    Navigator.pop(
-                      context,
-                    );
-                    //page Pop
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-                  onPressedCancel: () {
-                    Navigator.pop(context);
-                  },
-                )
-              : Navigator.pop(context);
-        }
+        // Pop naturally
       },
       child: Stack(
         children: [
@@ -99,25 +77,7 @@ class _Phase2RevertedApplicationDetailsState
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
-                  WarningCustomCupertinoAlertTwoButtons().showAlert(
-                    context,
-                    message:
-                        "Data of the Application ID : ${phase2RevertedApplDetailsProvider.clusterApplDetails[0].aPPLICATIONID} will be lost. Do you want to continue? ",
-                    onPressedOk: () {
-                      clearSavedData(context);
-                      //dialog pop
-                      Navigator.pop(
-                        context,
-                      );
-                      //page Pop
-                      Navigator.pop(
-                        context,
-                      );
-                    },
-                    onPressedCancel: () {
-                      Navigator.pop(context);
-                    },
-                  );
+                  Navigator.pop(context);
                 },
               ),
             ),
@@ -216,6 +176,10 @@ class _Phase2RevertedApplicationDetailsState
                                             hintText: "Layout Name",
                                             nameController:
                                                 layoutNameController,
+                                            onChanged: (val) async {
+                                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                                              await prefs.setString(SharedPrefConstants.layoutNameKey, val);
+                                            },
                                           ),
                                           AppInputTextfield(
                                             hintText:
@@ -228,6 +192,10 @@ class _Phase2RevertedApplicationDetailsState
                                           AppInputTextfield(
                                             hintText: "Plot No",
                                             nameController: plotNoController,
+                                            onChanged: (val) async {
+                                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                                              await prefs.setString(SharedPrefConstants.plotNoKey, val);
+                                            },
                                           ),
                                           AppInputTextfield(
                                             inputFormatters: [
@@ -241,13 +209,15 @@ class _Phase2RevertedApplicationDetailsState
                                             inputType: const TextInputType
                                                 .numberWithOptions(
                                                 decimal: true),
-                                            onChanged: (p0) {
+                                            onChanged: (p0) async {
                                               num plotArea =
                                                   num.tryParse(p0) ?? 0;
                                               num roadEffectedArea = num.tryParse(
                                                       roadEffectedAreaExtentController
                                                           .text) ??
                                                   0;
+                                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                                              await prefs.setString(SharedPrefConstants.plotAreaExtentKey, p0);
                                               if (roadEffectedArea < plotArea) {
                                                 if (plotArea -
                                                         roadEffectedArea >
@@ -256,11 +226,15 @@ class _Phase2RevertedApplicationDetailsState
                                                       roadEffectedArea;
                                                   netPlotAreaExtentController
                                                       .text = "$netplotArea";
+                                                  await prefs.setString(SharedPrefConstants.areaExtentKey, "$netplotArea");
                                                 } else {
                                                   plotAreaExtentController
                                                       .clear();
                                                   netPlotAreaExtentController
                                                       .clear();
+                                                  await prefs.setString(SharedPrefConstants.plotAreaExtentKey, "");
+                                                  await prefs.setString(SharedPrefConstants.areaExtentKey, "");
+                                                  if (!context.mounted) return;
                                                   FocusScope.of(context)
                                                       .unfocus();
                                                 }
@@ -269,6 +243,9 @@ class _Phase2RevertedApplicationDetailsState
                                                     .clear();
                                                 netPlotAreaExtentController
                                                     .clear();
+                                                await prefs.setString(SharedPrefConstants.roadAreaExtentKey, "");
+                                                await prefs.setString(SharedPrefConstants.areaExtentKey, "");
+                                                if (!context.mounted) return;
                                                 FocusScope.of(context)
                                                     .unfocus();
                                                 ValidationIoSAlert().showAlert(
@@ -297,6 +274,8 @@ class _Phase2RevertedApplicationDetailsState
                                                   0;
                                               num roadEffectedArea =
                                                   num.tryParse(value) ?? 0;
+                                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                                              await prefs.setString(SharedPrefConstants.roadAreaExtentKey, value);
 
                                               if (plotArea > 0) {
                                                 if (plotArea -
@@ -304,15 +283,18 @@ class _Phase2RevertedApplicationDetailsState
                                                     0) {
                                                   num netplotArea = plotArea -
                                                       roadEffectedArea;
+                                                  final netPlotStr = netplotArea.toStringAsFixed(2);
                                                   netPlotAreaExtentController
-                                                          .text =
-                                                      netplotArea
-                                                          .toStringAsFixed(2);
+                                                          .text = netPlotStr;
+                                                  await prefs.setString(SharedPrefConstants.areaExtentKey, netPlotStr);
                                                 } else {
                                                   roadEffectedAreaExtentController
                                                       .clear();
                                                   netPlotAreaExtentController
                                                       .clear();
+                                                  await prefs.setString(SharedPrefConstants.roadAreaExtentKey, "");
+                                                  await prefs.setString(SharedPrefConstants.areaExtentKey, "");
+                                                  if (!context.mounted) return;
                                                   FocusScope.of(context)
                                                       .unfocus();
                                                   ValidationIoSAlert().showAlert(
@@ -323,6 +305,8 @@ class _Phase2RevertedApplicationDetailsState
                                               } else {
                                                 roadEffectedAreaExtentController
                                                     .clear();
+                                                await prefs.setString(SharedPrefConstants.roadAreaExtentKey, "");
+                                                if (!context.mounted) return;
                                                 FocusScope.of(context)
                                                     .unfocus();
                                                 ValidationIoSAlert().showAlert(
@@ -396,6 +380,8 @@ class _Phase2RevertedApplicationDetailsState
                                                   phase2RevertedApplDetailsProvider
                                                       .changeMasterPlanZDP(
                                                           newValue);
+                                                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                  await prefs.setString(SharedPrefConstants.masterplanZdpKey, newValue?.landUseName ?? "");
                                                 },
                                                 selectedValue:
                                                     phase2RevertedApplDetailsProvider
@@ -713,6 +699,14 @@ class _Phase2RevertedApplicationDetailsState
       if (!mounted) return;
       await phase2RevertedApplDetailsProvider.getClusterApplDetails(context);
       if (phase2RevertedApplDetailsProvider.clusterApplDetails.isNotEmpty) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        final savedLayoutName = prefs.getString(SharedPrefConstants.layoutNameKey) ?? "";
+        final savedPlotNo = prefs.getString(SharedPrefConstants.plotNoKey) ?? "";
+        final savedPlotAreaExtent = prefs.getString(SharedPrefConstants.plotAreaExtentKey) ?? "";
+        final savedRoadAreaExtent = prefs.getString(SharedPrefConstants.roadAreaExtentKey) ?? "";
+        final savedAreaExtent = prefs.getString(SharedPrefConstants.areaExtentKey) ?? "";
+        final savedZdp = prefs.getString(SharedPrefConstants.masterplanZdpKey) ?? "";
+
         await LocalStoreHelper().writeData(
             SharedPrefConstants.sroCode,
             phase2RevertedApplDetailsProvider
@@ -729,32 +723,31 @@ class _Phase2RevertedApplicationDetailsState
             phase2RevertedApplDetailsProvider
                     .clusterApplDetails[0].sALEDEEDYEAR ??
                 "");
-        layoutNameController.text = phase2RevertedApplDetailsProvider
-                .clusterApplDetails[0].lAYOUTNAME ??
-            "";
+        layoutNameController.text = (phase2RevertedApplDetailsProvider
+                .clusterApplDetails[0].lAYOUTNAME ?? "").isNotEmpty
+            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? ""
+            : savedLayoutName;
         layoutOwnerController.text = phase2RevertedApplDetailsProvider
                 .clusterApplDetails[0].lAYOUTOWNERNAME ??
             "";
-        plotNoController.text =
-            phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTNO ??
-                "";
-        netPlotAreaExtentController.text = phase2RevertedApplDetailsProvider
-                .clusterApplDetails[0].aREAEXTENT ??
-            "";
+        plotNoController.text = (phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTNO ?? "").isNotEmpty
+            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTNO ?? ""
+            : savedPlotNo;
+        netPlotAreaExtentController.text = (phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? "").isNotEmpty
+            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? ""
+            : savedAreaExtent;
         plotAreaExtentController.text = (phase2RevertedApplDetailsProvider
                         .clusterApplDetails[0].pLOTAREAEXTENT ??
                     "".trim())
                 .isEmpty
-            ? phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].aREAEXTENT ??
-                ""
-            : phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].pLOTAREAEXTENT ??
-                "";
-        roadEffectedAreaExtentController.text =
-            phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].rOADAREAEXTENT ??
-                "";
+            ? ((phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? "").isNotEmpty
+                ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? ""
+                : savedPlotAreaExtent)
+            : phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTAREAEXTENT ?? "";
+        roadEffectedAreaExtentController.text = (phase2RevertedApplDetailsProvider
+                    .clusterApplDetails[0].rOADAREAEXTENT ?? "").isNotEmpty
+            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].rOADAREAEXTENT ?? ""
+            : savedRoadAreaExtent;
         villageNameController.text = phase2RevertedApplDetailsProvider
                 .clusterApplDetails[0].vILLAGENAME ??
             "";
@@ -773,9 +766,9 @@ class _Phase2RevertedApplicationDetailsState
         l3RemarksController.text =
             phase2RevertedApplDetailsProvider.clusterApplDetails[0].l3Remarks ??
                 "";
-        final zdp = phase2RevertedApplDetailsProvider
-                .clusterApplDetails[0].mASTERPLANZDP ??
-            "";
+        final zdp = (phase2RevertedApplDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "").isNotEmpty
+            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? ""
+            : savedZdp;
         if (zdp.isNotEmpty) {
           phase2RevertedApplDetailsProvider.selectedListMasterPlansZDP =
               phase2RevertedApplDetailsProvider.listMasterPlansZDP.firstWhere(
@@ -816,8 +809,8 @@ class _Phase2RevertedApplicationDetailsState
             phase2RevertedApplDetailsProvider
                     .clusterApplDetails[0].sALEDEEDYEAR ??
                 "");
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        final checkListStr = (phase2RevertedApplDetailsProvider
+
+        final apiChecklist = (phase2RevertedApplDetailsProvider
                         .clusterApplDetails[0].listSaveDatas !=
                     null &&
                 (phase2RevertedApplDetailsProvider
@@ -826,64 +819,75 @@ class _Phase2RevertedApplicationDetailsState
                     0)
             ? jsonEncode(phase2RevertedApplDetailsProvider
                 .clusterApplDetails[0].listSaveDatas)
-            : [];
-        prefs.setString(
-            SharedPrefConstants.checkListKey, checkListStr.toString());
-        prefs.setString(
-            SharedPrefConstants.layoutSelectedDocKey,
-            phase2RevertedApplDetailsProvider.clusterApplDetails[0].lAYOUTDOC ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.ecSelectedDocKey,
-            phase2RevertedApplDetailsProvider.clusterApplDetails[0].eCDOC ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.ownershipSelectedDocKey,
-            phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].oWNERSHIPDOC ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.plot1Img,
-            phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO1 ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.plot2Img,
-            phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO2 ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.plot3Img,
-            phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO3 ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.plot4ImgMasterPlanExt,
-            phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO4 ??
-                "");
+            : "";
+        final savedChecklist = prefs.getString(SharedPrefConstants.checkListKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.checkListKey,
+            apiChecklist.isNotEmpty ? apiChecklist : savedChecklist);
 
-        prefs.setString(
+        final apiLayoutDoc = phase2RevertedApplDetailsProvider.clusterApplDetails[0].lAYOUTDOC ?? "";
+        final savedLayoutDoc = prefs.getString(SharedPrefConstants.layoutSelectedDocKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.layoutSelectedDocKey,
+            apiLayoutDoc.isNotEmpty ? apiLayoutDoc : savedLayoutDoc);
+
+        final apiEcDoc = phase2RevertedApplDetailsProvider.clusterApplDetails[0].eCDOC ?? "";
+        final savedEcDoc = prefs.getString(SharedPrefConstants.ecSelectedDocKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.ecSelectedDocKey,
+            apiEcDoc.isNotEmpty ? apiEcDoc : savedEcDoc);
+
+        final apiOwnershipDoc = phase2RevertedApplDetailsProvider.clusterApplDetails[0].oWNERSHIPDOC ?? "";
+        final savedOwnershipDoc = prefs.getString(SharedPrefConstants.ownershipSelectedDocKey) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.ownershipSelectedDocKey,
+            apiOwnershipDoc.isNotEmpty ? apiOwnershipDoc : savedOwnershipDoc);
+
+        final apiPhoto1 = phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO1 ?? "";
+        final savedPhoto1 = prefs.getString(SharedPrefConstants.plot1Img) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot1Img,
+            apiPhoto1.isNotEmpty ? apiPhoto1 : savedPhoto1);
+
+        final apiPhoto2 = phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO2 ?? "";
+        final savedPhoto2 = prefs.getString(SharedPrefConstants.plot2Img) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot2Img,
+            apiPhoto2.isNotEmpty ? apiPhoto2 : savedPhoto2);
+
+        final apiPhoto3 = phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO3 ?? "";
+        final savedPhoto3 = prefs.getString(SharedPrefConstants.plot3Img) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot3Img,
+            apiPhoto3.isNotEmpty ? apiPhoto3 : savedPhoto3);
+
+        final apiPhoto4 = phase2RevertedApplDetailsProvider.clusterApplDetails[0].pHOTO4 ?? "";
+        final savedPhoto4 = prefs.getString(SharedPrefConstants.plot4ImgMasterPlanExt) ?? "";
+        await prefs.setString(
+            SharedPrefConstants.plot4ImgMasterPlanExt,
+            apiPhoto4.isNotEmpty ? apiPhoto4 : savedPhoto4);
+
+        final apiGisCoordinate = phase2RevertedApplDetailsProvider.clusterApplDetails[0].gISCORDINATE ?? "";
+        final savedGisCoordinate = prefs.getString(SharedPrefConstants.gisCoordinatesList) ?? "";
+        await prefs.setString(
             SharedPrefConstants.gisCoordinatesList,
-            phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].gISCORDINATE ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.mvEditFlagKey,
-            phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].mvEditFlag ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.mvRate2020Key,
-            phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].mVRATE2020 ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.mvRateDocumentKey,
-            phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].mVRATEDOCUMET ??
-                "");
-        prefs.setString(
-            SharedPrefConstants.conversionChargesKey,
-            phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].conversionCharges ??
-                "");
+            apiGisCoordinate.isNotEmpty ? apiGisCoordinate : savedGisCoordinate);
+
+        final apiMvEditFlag = phase2RevertedApplDetailsProvider.clusterApplDetails[0].mvEditFlag ?? "";
+        final savedMvEditFlag = prefs.getString(SharedPrefConstants.mvEditFlagKey) ?? "";
+        await prefs.setString(SharedPrefConstants.mvEditFlagKey, apiMvEditFlag.isNotEmpty ? apiMvEditFlag : savedMvEditFlag);
+
+        final apiMvRate2020 = phase2RevertedApplDetailsProvider.clusterApplDetails[0].mVRATE2020 ?? "";
+        final savedMvRate2020 = prefs.getString(SharedPrefConstants.mvRate2020Key) ?? "";
+        await prefs.setString(SharedPrefConstants.mvRate2020Key, apiMvRate2020.isNotEmpty ? apiMvRate2020 : savedMvRate2020);
+
+        final apiMvRateDoc = phase2RevertedApplDetailsProvider.clusterApplDetails[0].mVRATEDOCUMET ?? "";
+        final savedMvRateDoc = prefs.getString(SharedPrefConstants.mvRateDocumentKey) ?? "";
+        await prefs.setString(SharedPrefConstants.mvRateDocumentKey, apiMvRateDoc.isNotEmpty ? apiMvRateDoc : savedMvRateDoc);
+
+        final apiConversionCharges = phase2RevertedApplDetailsProvider.clusterApplDetails[0].conversionCharges ?? "";
+        final savedConversionCharges = prefs.getString(SharedPrefConstants.conversionChargesKey) ?? "";
+        await prefs.setString(SharedPrefConstants.conversionChargesKey, apiConversionCharges.isNotEmpty ? apiConversionCharges : savedConversionCharges);
       }
     });
   }
