@@ -723,31 +723,26 @@ class _Phase2RevertedApplicationDetailsState
             phase2RevertedApplDetailsProvider
                     .clusterApplDetails[0].sALEDEEDYEAR ??
                 "");
-        layoutNameController.text = (phase2RevertedApplDetailsProvider
-                .clusterApplDetails[0].lAYOUTNAME ?? "").isNotEmpty
-            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? ""
-            : savedLayoutName;
+        layoutNameController.text = savedLayoutName.isNotEmpty
+            ? savedLayoutName
+            : (phase2RevertedApplDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? "");
         layoutOwnerController.text = phase2RevertedApplDetailsProvider
                 .clusterApplDetails[0].lAYOUTOWNERNAME ??
             "";
-        plotNoController.text = (phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTNO ?? "").isNotEmpty
-            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTNO ?? ""
-            : savedPlotNo;
-        netPlotAreaExtentController.text = (phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? "").isNotEmpty
-            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? ""
-            : savedAreaExtent;
-        plotAreaExtentController.text = (phase2RevertedApplDetailsProvider
-                        .clusterApplDetails[0].pLOTAREAEXTENT ??
-                    "".trim())
-                .isEmpty
-            ? ((phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? "").isNotEmpty
-                ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? ""
-                : savedPlotAreaExtent)
-            : phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTAREAEXTENT ?? "";
-        roadEffectedAreaExtentController.text = (phase2RevertedApplDetailsProvider
-                    .clusterApplDetails[0].rOADAREAEXTENT ?? "").isNotEmpty
-            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].rOADAREAEXTENT ?? ""
-            : savedRoadAreaExtent;
+        plotNoController.text = savedPlotNo.isNotEmpty
+            ? savedPlotNo
+            : (phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTNO ?? "");
+        netPlotAreaExtentController.text = savedAreaExtent.isNotEmpty
+            ? savedAreaExtent
+            : (phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? "");
+        plotAreaExtentController.text = savedPlotAreaExtent.isNotEmpty
+            ? savedPlotAreaExtent
+            : ((phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTAREAEXTENT ?? "").trim().isNotEmpty
+                ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].pLOTAREAEXTENT ?? ""
+                : (phase2RevertedApplDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? ""));
+        roadEffectedAreaExtentController.text = savedRoadAreaExtent.isNotEmpty
+            ? savedRoadAreaExtent
+            : (phase2RevertedApplDetailsProvider.clusterApplDetails[0].rOADAREAEXTENT ?? "");
         villageNameController.text = phase2RevertedApplDetailsProvider
                 .clusterApplDetails[0].vILLAGENAME ??
             "";
@@ -766,9 +761,9 @@ class _Phase2RevertedApplicationDetailsState
         l3RemarksController.text =
             phase2RevertedApplDetailsProvider.clusterApplDetails[0].l3Remarks ??
                 "";
-        final zdp = (phase2RevertedApplDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "").isNotEmpty
-            ? phase2RevertedApplDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? ""
-            : savedZdp;
+        final zdp = savedZdp.isNotEmpty
+            ? savedZdp
+            : (phase2RevertedApplDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "");
         if (zdp.isNotEmpty) {
           phase2RevertedApplDetailsProvider.selectedListMasterPlansZDP =
               phase2RevertedApplDetailsProvider.listMasterPlansZDP.firstWhere(

@@ -1067,15 +1067,15 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
         final savedPlotNo = prefs.getString(SharedPrefConstants.plotNoKey) ?? "";
         final savedZdp = prefs.getString(SharedPrefConstants.masterplanZdpKey) ?? "";
 
-        layoutNameController.text = (applicationDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? "").isNotEmpty
-            ? applicationDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? ""
-            : savedLayoutName;
+        layoutNameController.text = savedLayoutName.isNotEmpty
+            ? savedLayoutName
+            : (applicationDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? "");
         layoutOwnerController.text =
             applicationDetailsProvider.clusterApplDetails[0].lAYOUTOWNERNAME ??
                 "";
-        plotNoController.text = (applicationDetailsProvider.clusterApplDetails[0].pLOTNO ?? "").isNotEmpty
-            ? applicationDetailsProvider.clusterApplDetails[0].pLOTNO ?? ""
-            : savedPlotNo;
+        plotNoController.text = savedPlotNo.isNotEmpty
+            ? savedPlotNo
+            : (applicationDetailsProvider.clusterApplDetails[0].pLOTNO ?? "");
         netPlotAreaExtentController.text =
             applicationDetailsProvider.clusterApplDetails[0].aREAEXTENT ?? "";
         plotAreaExtentController.text = (applicationDetailsProvider
@@ -1100,9 +1100,9 @@ class _IGRSApplicationDetailsState extends State<IGRSApplicationDetails> {
             applicationDetailsProvider.clusterApplDetails[0].l2Remarks ?? "";
         l3RemarksController.text =
             applicationDetailsProvider.clusterApplDetails[0].l3Remarks ?? "";
-        final zdp = (applicationDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "").isNotEmpty
-            ? applicationDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? ""
-            : savedZdp;
+        final zdp = savedZdp.isNotEmpty
+            ? savedZdp
+            : (applicationDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "");
         if (zdp.isNotEmpty) {
           applicationDetailsProvider.selectedListMasterPlansZDP =
               applicationDetailsProvider.listMasterPlansZDP.firstWhere(

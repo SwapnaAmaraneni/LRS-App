@@ -756,10 +756,9 @@ class _Phase2RevertedLayoutApplicationDetailsState
               phase2RevertedLayoutAppDetailsProvider
                       .clusterApplDetails[0].sALEDEEDYEAR ??
                   "");
-          layoutNameController.text = (phase2RevertedLayoutAppDetailsProvider
-                  .clusterApplDetails[0].lAYOUTNAME ?? "").isNotEmpty
-              ? phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? ""
-              : savedLayoutName;
+          layoutNameController.text = savedLayoutName.isNotEmpty
+              ? savedLayoutName
+              : (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].lAYOUTNAME ?? "");
           layoutOwnerController.text = phase2RevertedLayoutAppDetailsProvider
                   .clusterApplDetails[0].lAYOUTOWNERNAME ??
               "";
@@ -775,22 +774,18 @@ class _Phase2RevertedLayoutApplicationDetailsState
               "";
 
           //layout
-          phase2RevertedLayoutAppDetailsProvider.totalNoOfPlotsController.text =
-              (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoPlots ?? "").isNotEmpty
-              ? phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoPlots ?? ""
-              : savedTotalNoOfPlots;
-          phase2RevertedLayoutAppDetailsProvider.soldPlotsController.text =
-              (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoSoldPlots ?? "").isNotEmpty
-              ? phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoSoldPlots ?? ""
-              : savedSoldPlots;
-          phase2RevertedLayoutAppDetailsProvider.unsoldPlotsController.text =
-              (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoUnSoldPlots ?? "").isNotEmpty
-              ? phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoUnSoldPlots ?? ""
-              : savedUnsoldPlots;
-          phase2RevertedLayoutAppDetailsProvider.totalUnsoldPlotAreaController.text =
-              (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoAreaExtent ?? "").isNotEmpty
-              ? phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoAreaExtent ?? ""
-              : savedTotalUnsoldPlotArea;
+          phase2RevertedLayoutAppDetailsProvider.totalNoOfPlotsController.text = savedTotalNoOfPlots.isNotEmpty
+              ? savedTotalNoOfPlots
+              : (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoPlots ?? "");
+          phase2RevertedLayoutAppDetailsProvider.soldPlotsController.text = savedSoldPlots.isNotEmpty
+              ? savedSoldPlots
+              : (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoSoldPlots ?? "");
+          phase2RevertedLayoutAppDetailsProvider.unsoldPlotsController.text = savedUnsoldPlots.isNotEmpty
+              ? savedUnsoldPlots
+              : (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoUnSoldPlots ?? "");
+          phase2RevertedLayoutAppDetailsProvider.totalUnsoldPlotAreaController.text = savedTotalUnsoldPlotArea.isNotEmpty
+              ? savedTotalUnsoldPlotArea
+              : (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].totalNoAreaExtent ?? "");
 
           //layout
           villageNameController.text = phase2RevertedLayoutAppDetailsProvider
@@ -849,9 +844,9 @@ class _Phase2RevertedLayoutApplicationDetailsState
                   .clusterApplDetails[0].l3Remarks ??
               "";
 
-          final zdp = (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "").isNotEmpty
-              ? phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? ""
-              : savedZdp;
+          final zdp = savedZdp.isNotEmpty
+              ? savedZdp
+              : (phase2RevertedLayoutAppDetailsProvider.clusterApplDetails[0].mASTERPLANZDP ?? "");
           if (zdp.isNotEmpty) {
             phase2RevertedLayoutAppDetailsProvider.selectedListMasterPlansZDP =
                 phase2RevertedLayoutAppDetailsProvider.listMasterPlansZDP
